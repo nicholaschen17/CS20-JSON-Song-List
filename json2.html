@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>JSON2</title>
+  </head>
+  <body>
+    <ul id="song-list"></ul>
+    <script>
+      fetch('songlist.json')
+        .then(response => response.json()) // Parse the JSON data
+        .then(data => {
+          const songList = document.getElementById('song-list');
+          data.songs.forEach(song => {
+            const li = document.createElement('li');
+            li.textContent = `${song.title} - ${song.artist} (${song.year})`;
+            songList.appendChild(li);
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    </script>
+  </body>
+</html>
