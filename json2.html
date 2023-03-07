@@ -3,23 +3,91 @@
   <head>
     <meta charset="UTF-8">
     <title>JSON2</title>
+    <style>
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+      }
+      th {
+        background-color: #ccc;
+      }
+    </style>
   </head>
   <body>
-    <ul id="song-list"></ul>
+    <label for="genre-select">Select a genre:</label>
+    <select id="genre-select"></select>
+    <button id="filter-button">Filter</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Artist</th>
+          <th>Genre</th>
+          <th>Year</th>
+        </tr>
+      </thead>
+      <tbody id="song-table"></tbody>
+    </table>
     <script>
       fetch('songlist.json')
         .then(response => response.json()) // Parse the JSON data
         .then(data => {
-          const songList = document.getElementById('song-list');
+          const songTable = document.getElementById('song-table');
+          const genreSet = new Set();
           data.songs.forEach(song => {
-            const li = document.createElement('li');
-            li.textContent = `${song.title} - ${song.artist} (${song.year})`;
-            songList.appendChild(li);
+            song.genre.forEach(genre => genreSet.add(genre));
+            const tr = document.createElement('tr');
+            const titleTd = document.createElement('td');
+            const artistTd = document.createElement('td');
+            const genreTd = document.createElement('td');
+            const yearTd = document.createElement('td');
+            titleTd.textContent = song.title;
+            artistTd.textContent = song.artist;
+            genreTd.textContent = song.genre.join(', ');
+            yearTd.textContent = song.year;
+            tr.appendChild(titleTd);
+            tr.appendChild(artistTd);
+            tr.appendChild(genreTd);
+            tr.appendChild(yearTd);
+            songTable.appendChild(tr);
+          });
+          const genreSelect = document.getElementById('genre-select');
+          genreSet.forEach(genre => {
+            const option = document.createElement('option');
+            option.value = genre;
+            option.text = genre;
+            genreSelect.appendChild(option);
+          });
+          const filterButton = document.getElementById('filter-button');
+          filterButton.addEventListener('click', () => {
+            const selectedGenre = genreSelect.value;
+            const filteredSongs = data.songs.filter(song => song.genre.includes(selectedGenre));
+            songTable.innerHTML = ''; // clear the existing table
+            filteredSongs.forEach(song => {
+              const tr = document.createElement('tr');
+              const titleTd = document.createElement('td');
+              const artistTd = document.createElement('td');
+              const genreTd = document.createElement('td');
+              const yearTd = document.createElement('td');
+              titleTd.textContent = song.title;
+              artistTd.textContent = song.artist;
+              genreTd.textContent = song.genre.join(', ');
+              yearTd.textContent = song.year;
+              tr.appendChild(titleTd);
+              tr.appendChild(artistTd);
+              tr.appendChild(genreTd);
+              tr.appendChild(yearTd);
+              songTable.appendChild(tr);
+            });
           });
         })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+  .catch(error => {
+    console.error('Error:', error);
+  });
+
+
     </script>
   </body>
 </html>
+
